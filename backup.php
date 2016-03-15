@@ -1,20 +1,41 @@
 <?php
-/* CONFIGURATION */
-$user         = 'your-username';
-$pass         = 'your-password';
-$database     = 'your-database';
-$path         = '/target-directory';
-$rotationDays =  2;
+$configurationPath = __DIR__ . '/config.php';
+$configuration     = [
+	'user'         => null,
+	'pass'         => null,
+	'database'    => null,
+	'path'         => null,
+	'rotationDays' => 365
+];
 
-/* IMPLEMENTATION */
+if (file_exists($configurationPath)) {
+	$customConfiguration = include($configurationPath);
+	$configuration = array_merge($configuration, $customConfiguration);
+}
+
+foreach ($argv as $argument) {
+	if ('--' === substr($argument, 0, 2)) {
+		$keyValue = explode('=', substr($argument, 2));
+
+		if (2 !== count($keyValue)) {
+			die('Arguments need to be passed like: backup.php --configurationKey=configurationValue');
+		}
+
+		$key   = $keyValue[0];
+		$value = $keyValue[1];
+
+		$configuration[$key] = $value;
+	}
+}
+
 $dateTime     = date(DateTime::W3C);
-$databasePath = rtrim($path, '/') . '/' . $database;
+$databasePath = rtrim($configuration['path'], '/') . '/' . $configuration['database'];
 $fileName     = $dateTime . '.sql';
 $fullPath     = $databasePath . '/' . $fileName;
 
 $command      = sprintf(
-    'mysqldump --user=%s --password=%s %s > %s 2>/dev/null',
-    $user, $pass, $database, $fullPath
+    'mysqldump --user=%s --password=%s %s > %s',
+    $configuration['user'], $configuration['pass'], $configuration['database'], $fullPath
 );
 
 if (!is_dir($databasePath)) {
@@ -29,8 +50,8 @@ exec('gzip ' . $fullPath);
 
 echo 'Backup zipped.' . PHP_EOL;
 
-$handle          = opendir($databasePath);
-$rotationLimit   = time() - $rotationDays * 24 *60 * 60;
+$handle        = opendir($databasePath);
+$rotationLimit = time() - $configuration['rotationDays'] * 24 *60 * 60;
 
 while ($file = readdir($handle)) {
 	if ('.' === $file{0}) {
