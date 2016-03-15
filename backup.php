@@ -1,9 +1,9 @@
 <?php
 /* CONFIGURATION */
-$user         = 'root';
-$pass         = 'jukehaus14';
-$database     = 'lurchdb';
-$path         = '/backup';
+$user         = 'your-username';
+$pass         = 'your-password';
+$database     = 'your-password';
+$path         = '/target-directory';
 $rotationDays =  2;
 
 /* IMPLEMENTATION */
