@@ -2,7 +2,7 @@
 /* CONFIGURATION */
 $user         = 'your-username';
 $pass         = 'your-password';
-$database     = 'your-password';
+$database     = 'your-database';
 $path         = '/target-directory';
 $rotationDays =  2;
 
